@@ -1,38 +1,26 @@
 var bodyParser = require('body-parser'),
-    configs = require('./configs'),
-    cookieParser = require('cookie-parser'),
-    express = require('express'), 
-    app = express(),
-    favicon = require('serve-favicon'),
-    hbs = require('hbs'),
-    hbsUtility = require('./utilities/hbsUtility'),
-    log4js = require('log4js'),
-    log = log4js.getLogger('Express'),
-    path = require('path'),
-    server = require('http').Server(app),
-    SocketManager = require('./socket/socketManager'),
-    socketManager = new SocketManager(server),
-    EventEmitter = require('events'),
-    events = new EventEmitter();
+  configs = require('./configs'),
+  cookieParser = require('cookie-parser'),
+  express = require('express'),
+  app = express(),
+  favicon = require('serve-favicon'),
+  hbs = require('hbs'),
+  hbsUtility = require('./utilities/hbsUtility'),
+  log4js = require('log4js'),
+  log = log4js.getLogger('Express'),
+  path = require('path'),
+  server = require('http').Server(app),
+  SocketManager = require('./socket/socketManager'),
+  socketManager = new SocketManager(server),
+  events = require('./libraries/events').getInstance();
 
 var root = require('./routes/index');
 
-// log4js.addAppender(socketAppender.appender);
-// log4js.addAppender('./libraries/socketAppender');
-
 log4js.configure({
-  appenders:[
-    { type: 'console'},
-    { type: '../../../libraries/socketAppender'}
+  appenders: [
+    { type: 'console' },
+    { type: '../../../libraries/socketAppender' }
   ]
-})
-
-
-events.on('log:info', function(){
-  console.log('caught on app..', arguments);
-})
-events.on('log:debug', function(){
-  console.log('caught on app..', arguments);
 })
 
 // view engine setup
@@ -60,7 +48,7 @@ app.use('/includes/bootstrap', express.static(path.join(__dirname, 'node_modules
 app.use('/', root);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
@@ -71,7 +59,7 @@ app.use(function(req, res, next) {
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
+  app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render('error', {
       message: err.message,
@@ -82,7 +70,7 @@ if (app.get('env') === 'development') {
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error', {
     message: err.message,
@@ -90,8 +78,8 @@ app.use(function(err, req, res, next) {
   });
 });
 
-server.listen(configs.server.port, function(){
-    log.info("Starting up http service on port %d", configs.server.port);
+server.listen(configs.server.port, function () {
+  log.info("Starting up http service on port %d", configs.server.port);
 });
 
 module.exports = app;

@@ -8,7 +8,10 @@
   var socket = io.connect(),
       $statusIcon = $('#socket-status')
       $textStatus = $('#status-text'),
-      $logs = $('#status-log')
+      $logs = $('#status-log'),
+      $gameEngine = $('#current-game-engine'),
+      $roundCount = $('#round-count'),
+      $trainingMode = $('#training-mode')
       ;
 
     socket.on('connect', function () {
@@ -30,9 +33,18 @@
     });
 
     socket.on('update:text-status', function(text){
-      console.log(text, $textStatus)
-      $textStatus.text(text)
-    })
+      $textStatus.text(text);
+    });
+
+    socket.on('update:gameEngine', function(newGameEngine){
+      $gameEngine.text(newGameEngine);
+    });
+    socket.on('update:roundCount', function(newRoundCount){
+      $roundCount.text(newRoundCount);
+    });
+    socket.on('update:trainingMode', function(newTrainingMode){
+      $trainingMode.text(newTrainingMode);
+    });
 
     socket.on('log:debug', function(){
       $logs.append('<span class="debug"'+JSON.stringify(arguments)+'></span>')

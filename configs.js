@@ -4,31 +4,31 @@ module.exports = {
         port: 3100
     },
     waitMultiplyer: 2,
-    natuku:{
+    natuku: {
         username: "rahvin708@yahoo.com",
         password: "n1s1m0n3"
     },
     game: {
         active: [
-            'osawari', 
+            'osawari',
             'aigis'
         ]
     },
     osawari: {
         url: "http://www.nutaku.net/games/osawari-island/play/",
-        mode: 'daily',
-        // mode: 'static',
+        // mode: 'daily',
+        mode: 'static',
         playCycleCount: 16, //11
         // playCycleCou5nt: 6,
         location: 'eventOne',
         // location: 'eventTwo',
-        levelRow: 2  
+        levelRow: 2
     },
     aigis: {
         url: "http://www.nutaku.net/games/millennium-war-aigis/play/",
         mode: 'daily'
     },
-    selenium:{
+    selenium: {
         // browser: 'firefox',
         // browser:'ie',
         browser: 'chrome',
