@@ -1,4 +1,5 @@
-var configs = require('../../configs'),
+var _ = require('lodash'),
+  configs = require('../../configs'),
   events = require('../../libraries/events').getInstance(),
   log = require('log4js').getLogger('Osawari Trainer'),
   GameEngine = require('../../gameEngine'),
@@ -11,7 +12,8 @@ var configs = require('../../configs'),
   wait = require('../../utilities/wait');
 
 var locations = {
-  startAdventure: { x: 738, y: 413 },
+  center: { x: 270, y: 480 },
+  startGame: { x: 738, y: 413 },
   playQuest: { x: 817, y: 366 },
   eventOne: { x: 401, y: 150 },
   eventTwo: { x: 555, y: 156 },
@@ -33,24 +35,15 @@ function IslandGame(nutakuPage, gameConfigs) {
 
 IslandGame.prototype = Object.create(GameEngine.prototype);
 
-IslandGame.prototype.startGame = function (context) {
-  var driver = this.driver;
+// IslandGame.prototype.startGame = function (context) {
+//   var driver = this.driver;
 
-  return context.click.startAdventure(context)
-    .then(function () {
-      log.debug('waiting for game to load..')
-      return wait(30)
-    })
-  // TODO: Move this to the logic for level training 
-  //
-  // .then(function(){
-  //   return context.click.playQuest(context);
-  // })
-  // .then(function(){
-  //   return wait(7);
-  // })
-
-}
+//   return context.click.startAdventure(context)
+//     .then(function () {
+//       log.debug('waiting for game to load..')
+//       return wait(30)
+//     })
+// }
 
 IslandGame.prototype.determineLocation = function (context) {
   var clickAction;
@@ -165,7 +158,6 @@ IslandGame.prototype.playStatic = function (context) {
               return wait(5);
             })
             .then(function () {
-              currentCount++;
               queueCompletedCallback();
             })
         })
@@ -173,6 +165,7 @@ IslandGame.prototype.playStatic = function (context) {
       }
 
       playQueue.on('success', function () {
+        currentCount++;
         log.info("Completed a round");
       })
 
@@ -229,22 +222,9 @@ IslandGame.prototype.executeCycle = function (context, locationSelector, levelSe
     })
 }
 
-IslandGame.prototype.click = {
-  boardLocation: function (context, coordinates, logMessageName) {
-    var driver = context.driver;
-
-    log.debug("clicking '%s' location", logMessageName)
-
-    return new ActionSequence(driver)
-      .mouseMove(context.board, coordinates)
-      .click()
-      .perform()
-      .catch(function (e) {
-        log.error("failed to click '%s' location: %o", logMessageName, coordinates, e)
-      })
-  },
-  startAdventure: function (context) {
-    return this.boardLocation(context, locations.startAdventure, 'Start Adventure');
+var localClickActions = {
+  startGame: function (context) {
+    return context.click.boardLocation(context, locations.startGame, 'Start Adventure');
   },
   playQuest: function (context) {
     return context.click.boardLocation(context, locations.playQuest, 'Play Quest');
@@ -282,40 +262,15 @@ IslandGame.prototype.click = {
   eventRewards: function (context) {
     return context.click.boardLocation(context, locations.eventRewards, 'Event Rewards - Play Again');
   }
-}
+}, localQueries = {
 
-IslandGame.prototype.havestDaily = function (context) {
-  var board;
+};
 
-  return wait(10)
-    .then(function () {
-      return context.getBoard(context)
-    })
-    .then(function (gameBoard) {
-      if (gameBoard) {
-        board = gameBoard;
-        return gameBoard.click();
-      } else {
-        throw exception('gamboard was an unexpected value: ' + gameBoard);
-      }
-    })
-    .then(function () {
-      return wait(10);
-    })
-    .then(function () {
-      return board.click();
-    })
-    .then(function () {
-      return wait(10);
-    })
-    .then(function () {
-      return board.click();
-    })
-}
 
-IslandGame.prototype.queries = {
-  board: By.id('game_frame')
-}
+_.merge(IslandGame.prototype.click, localClickActions);
+_.merge(IslandGame.prototype.queries, localQueries);
+
+IslandGame.prototype.locations = locations;
 
 module.exports = IslandGame;
 module.exports.locations = locations;

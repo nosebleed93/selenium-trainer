@@ -30,6 +30,9 @@ publicMethods = {
       .then(() => {
         return publicMethods.runTrainers();
       })
+      .then(() =>{
+        log.info("Training completed")
+      })
   },
   getSeleniumDriverInstance: () => {
     var seleniumServerPath = configs.selenium.protocol + "://" + configs.selenium.host + ':' + configs.selenium.port + configs.selenium.path;
@@ -60,6 +63,16 @@ publicMethods = {
             log.debug("Aigis game configured");
             var Aigis = require('./pages/game/aigis');
             gameEngine = new Aigis(nutakuPage, configs.aigis);
+            break;
+          case 'hellfire':
+            log.debug("Hellfire game configured");
+            var Hellfire = require('./pages/game/hellfire');
+            gameEngine = new Hellfire(nutakuPage, configs.hellfire);
+            break;
+          case 'hellfireUS':
+            log.debug("Hellfire US game configured");
+            var HellfireUS = require('./pages/game/hellfire-us');
+            gameEngine = new HellfireUS(nutakuPage, configs.hellfireUS);
             break;
 
           default:

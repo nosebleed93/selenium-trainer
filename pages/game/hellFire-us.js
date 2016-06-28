@@ -1,5 +1,9 @@
-var configs = require('../../configs'),
-  log = require('log4js').getLogger('Aigis Trainer'),
+/**
+ * Merge with hellfire game
+ */
+var _ = require('lodash'),
+  configs = require('../../configs'),
+  log = require('log4js').getLogger('Hellfire US Trainer'),
   GameEngine = require('../../gameEngine'),
   webdriver = require('selenium-webdriver'),
   ActionSequence = webdriver.ActionSequence,
@@ -9,31 +13,27 @@ var configs = require('../../configs'),
   RSVP = require('rsvp'),
   wait = require('../../utilities/wait');
 
-var board,
-  locations = {
-    center: { x: 475, y: 275 },
-    startGame: { x: 475, y: 275 },
-  };
+var locations = {
+  startGame: { x: 140, y: 72 },
+  home: { x: 57, y: 49 },
+  mainMenu: { x: 918, y: 45 },
+  missions: { x: 114, y: 205 },
+  missionRowOne: { x: 504, y: 209 },
+  missionRowTwo: { x: 504, y: 374 },
+  missionDoIt: { x: 757, y: 520 }
+};
 
-function AigisGame(nutakuPage, gameConfigs) {
+function HellFireUSGame(nutakuPage, gameConfigs) {
   GameEngine.call(this, nutakuPage, gameConfigs);
-  this.constructor = AigisGame;
-  this.type = 'Aigis';
+  this.constructor = HellFireUSGame;
+  this.type = 'Hell Fire Girls US';
 }
 
-AigisGame.prototype = Object.create(GameEngine.prototype);
+HellFireUSGame.prototype = Object.create(GameEngine.prototype);
 
-AigisGame.prototype.getBoard = function () {
-  if (board != undefined) {
-    return board;
-  } else {
-    return board = this.driver.findElement(this.queries.board)
-  }
-}
-
-var clickActions = {
-  playGame: function (context) {
-    return context.click.boardLocation(context, locations.play, 'Play Game');
+var localClickActions = {
+  startGame: function (context) {
+    return context.click.boardLocation(context, locations.startGame, 'Start Game');
   },
   home: function (context) {
     return context.click.boardLocation(context, locations.home, 'Home');
@@ -53,14 +53,15 @@ var clickActions = {
   missionDoIt: function (context) {
     return context.click.boardLocation(context, locations.missionDoIt, 'Mission - Do It');
   }
-}, localQueries = {
+},
+  localQueries = {
 
-}
+  }
 
-_.merge(AigisGame.prototype.click, clickActions);
-_.merge(AigisGame.prototype.queries, localQueries);
+_.merge(HellFireUSGame.prototype.click, localClickActions);
+_.merge(HellFireUSGame.prototype.queries, localQueries);
 
-AigisGame.prototype.locations = locations;
+HellFireUSGame.prototype.locations = locations;
 
-module.exports = AigisGame;
+module.exports = HellFireUSGame;
 module.exports.locations = locations;

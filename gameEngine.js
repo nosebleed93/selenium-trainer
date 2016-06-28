@@ -16,12 +16,32 @@ function GameEngine(nutakuPage, gameConfigs) {
   this.board = null;
 }
 
-GameEngine.prototype.getBoard = function (context) {
-  if (context.board != undefined) {
-    return context.board;
-  } else {
-    return context.board = context.driver.findElement(context.queries.board)
-  }
+GameEngine.prototype.beginTrainer = function () {
+  var configs = this.configs,
+    driver = this.driver,
+    context = this;
+
+  log.info('Starting %s training', context.type);
+
+  return driver.get(configs.url)
+    .then(function () {
+      log.debug("looking for game board");
+      return context.getBoard(context)
+    })
+    .catch(function (e) {
+      log.error('unable to find game board!', e);
+    })
+    .then(function () {
+      log.debug("Found game board");
+    })
+    .then(() => wait(7))
+    .then(function () {
+      return context.startGame(context);
+    })
+    .then(function () {
+      return context.configureMode(context);
+    })
+
 }
 
 GameEngine.prototype.configureMode = function (context) {
@@ -43,39 +63,77 @@ GameEngine.prototype.configureMode = function (context) {
 
     case 'daily':
       log.info("Configured to harvest daily rewards only");
-      log.warn("Daily trainer not yet implemented");
       gamePlayModeHandler = context.havestDaily;
       events.emit('update:trainingMode', 'daily')
   }
   return gamePlayModeHandler(context);
 }
 
-GameEngine.prototype.beginTrainer = function () {
-  var configs = this.configs,
-    driver = this.driver,
-    context = this;
+GameEngine.prototype.havestDaily = function (context) {
+  var board;
 
-  log.info('Starting %s training', context.type);
-
-  return driver.get(configs.url)
+  return wait(10)
     .then(function () {
-      log.debug("looking for game board");
       return context.getBoard(context)
     })
-    .catch(function (e) {
-      log.error('unable to find game board!', e);
+    .then(function () {
+      return context.click.center(context);
     })
     .then(function () {
-      log.debug("Found game board");
-    })
-    .then(() => wait(5))
-    .then(function () {
-      return context.startGame(context);
+      return wait(10);
     })
     .then(function () {
-      return context.configureMode(context);
+      return context.click.center(context);
     })
+    .then(function () {
+      return wait(10);
+    })
+    .then(function () {
+      return context.click.center(context);
+    })
+};
 
+GameEngine.prototype.getBoard = function (context) {
+  if (context.board != undefined) {
+    return context.board;
+  } else {
+    return context.board = context.driver.findElement(context.queries.board)
+  }
 }
+
+GameEngine.prototype.startGame = function (context) {
+  var driver = this.driver;
+
+  return context.click.startGame(context)
+    .then(function () {
+      log.debug('waiting for game to load..')
+      return wait(30)
+    })
+}
+
+
+GameEngine.prototype.click = {
+  boardLocation: function (context, coordinates, logMessageName) {
+    var driver = context.driver;
+
+    log.debug("clicking '%s' location", logMessageName)
+    log.debug('cords: ', coordinates);
+
+    return new ActionSequence(driver)
+      .mouseMove(context.board, coordinates)
+      .click()
+      .perform()
+      .catch(function (e) {
+        log.error("failed to click '%s' location: %o", logMessageName, coordinates, e)
+      })
+  },
+  center: function (context) {
+    return context.click.boardLocation(context, context.locations.center, 'Center of Board');
+  },
+};
+
+GameEngine.prototype.queries = {
+  board: By.id('game_frame')
+};
 
 module.exports = GameEngine;
