@@ -142,8 +142,9 @@ IslandGame.prototype.determineRow = function (context) {
 }
 
 IslandGame.prototype.playStatic = function (context) {
-  var cycleCount = 1;
-  deferred = RSVP.defer(),
+  var cycleCount = 1,
+    currentCount = 0,
+    deferred = RSVP.defer(),
     driver = this.driver,
     locationSelector = context.determineLocation(context),
     levelSelector = context.determineRow(context),
@@ -158,13 +159,13 @@ IslandGame.prototype.playStatic = function (context) {
     })
     .then(function () {
       for (var i = 1; i <= configs.osawari.playCycleCount; i++) {
-        playQueue.push(function (queueCompletedCallback) {
-          var currentCount = i;
+        playQueue.push((queueCompletedCallback) => {
           context.executeCycle(context, locationSelector, levelSelector, currentCount)
             .then(function () {
               return wait(5);
             })
             .then(function () {
+              currentCount++;
               queueCompletedCallback();
             })
         })
@@ -186,10 +187,10 @@ IslandGame.prototype.playStatic = function (context) {
 }
 
 IslandGame.prototype.executeCycle = function (context, locationSelector, levelSelector, cycleCount) {
-  log.info("Starting play round %s", cycleCount);
-  events.emit('update:roundCount', cycleCount);
   return locationSelector(context)
     .then(function () {
+      log.info("Starting play round %s", cycleCount);
+      events.emit('update:roundCount', cycleCount);
       return wait(3)
     })
     .then(function () {

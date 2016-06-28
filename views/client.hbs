@@ -47,10 +47,10 @@
     });
 
     socket.on('log:debug', function(){
-      $logs.append('<span class="debug"'+JSON.stringify(arguments)+'></span>')
+      $logs.append('<span class="debug">'+JSON.stringify(arguments)+'</span>')
     })
     socket.on('log:info', function(){
-      $logs.append('<span class="info"'+JSON.stringify(arguments)+'></span>')
+      $logs.append('<span class="info">'+JSON.stringify(arguments)+'</span>')
     })
     
     $('#control-play').on('click', function(){
