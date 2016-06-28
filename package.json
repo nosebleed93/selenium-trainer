@@ -1,0 +1,35 @@
+{
+  "name": "selenium-trainer",
+  "version": "1.0.0",
+  "description": "selenium bot for Nutaku games",
+  "main": "trainer.js",
+  "scripts": {
+    "start": "node trainer.js",
+    "startWeb":"node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository" :
+  { 
+    "type" : "git",
+    "url" : "https://github.com/nosebleed93/selenium-trainer.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "queue": "^4.0.0",
+    "rsvp": "^3.2.1",
+    "selenium-webdriver": "~2.53.2",
+    "body-parser": "~1.13.2",
+    "bootstrap": "^3.3.6",
+    "cookie-parser": "~1.3.5",
+    "debug": "~2.2.0",
+    "express": "~4.13.1",
+    "hbs": "~3.1.0",
+    "lodash": "^4.13.1",
+    "log4js": "^0.6.37",
+    "morgan": "~1.6.1",
+    "node-sass-middleware": "0.8.0",
+    "serve-favicon": "~2.3.0",
+    "socket.io": "^1.4.6"
+  }
+}

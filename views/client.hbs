@@ -1,0 +1,56 @@
+{{> seleniumStatus}}
+
+<p>Client test</p>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  $(function(){
+  var socket = io.connect(),
+      $statusIcon = $('#socket-status')
+      $textStatus = $('#status-text'),
+      $logs = $('#status-log')
+      ;
+
+    socket.on('connect', function () {
+      $statusIcon
+        .removeClass('text-danger text-warning')
+        .addClass('text-success');
+    });
+    
+    socket.on('disconnect reconnect_error', function(){
+      $statusIcon
+        .removeClass('text-success  text-warning')
+        .addClass('text-danger');
+    });
+    
+    socket.on('reconnecting', function(){
+      $statusIcon
+        .removeClass('text-success  text-danger')
+        .addClass('text-warning');
+    });
+
+    socket.on('update:text-status', function(text){
+      console.log(text, $textStatus)
+      $textStatus.text(text)
+    })
+
+    socket.on('log:debug', function(){
+      $logs.append('<span class="debug"'+JSON.stringify(arguments)+'></span>')
+    })
+    socket.on('log:info', function(){
+      $logs.append('<span class="info"'+JSON.stringify(arguments)+'></span>')
+    })
+    
+    $('#control-play').on('click', function(){
+      console.log("Emmitting contol:play")
+      socket.emit('control:play');
+    });
+    $('#control-stop').on('click', function(){
+      console.log("Emmitting contol:top")
+      socket.emit('control:stop');
+    });
+  })
+
+  
+
+</script>
