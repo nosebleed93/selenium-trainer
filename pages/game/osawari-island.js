@@ -31,6 +31,7 @@ function IslandGame(nutakuPage, gameConfigs) {
   GameEngine.call(this, nutakuPage, gameConfigs);
   this.constructor = IslandGame;
   this.type = 'Oswari Island';
+  this.url =  "http://www.nutaku.net/games/osawari-island/play/";
 }
 
 IslandGame.prototype = Object.create(GameEngine.prototype);
@@ -223,9 +224,9 @@ IslandGame.prototype.executeCycle = function (context, locationSelector, levelSe
 }
 
 var localClickActions = {
-  startGame: function (context) {
-    return context.click.boardLocation(context, locations.startGame, 'Start Adventure');
-  },
+  // startGame: function (context) {
+  //   return context.click.boardLocation(context, locations.startGame, 'Start Adventure');
+  // },
   playQuest: function (context) {
     return context.click.boardLocation(context, locations.playQuest, 'Play Quest');
   },
@@ -245,10 +246,10 @@ var localClickActions = {
     return context.click.boardLocation(context, locations.rowTwo, 'Row Two');
   },
   rowThree: function (context) {
-    return this.boardLocation(context, locations.rowThree, 'Row Three');
+    return context.boardLocation(context, locations.rowThree, 'Row Three');
   },
   rowFour: function (context) {
-    return this.boardLocation(context, locations.rowFour, 'Row Four');
+    return context.boardLocation(context, locations.rowFour, 'Row Four');
   },
   capture: function (context) {
     return context.click.boardLocation(context, locations.capture, 'Capture Eromon');
@@ -265,7 +266,6 @@ var localClickActions = {
 }, localQueries = {
 
 };
-
 
 _.merge(IslandGame.prototype.click, localClickActions);
 _.merge(IslandGame.prototype.queries, localQueries);

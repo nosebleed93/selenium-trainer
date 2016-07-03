@@ -19,12 +19,12 @@ NutakuPage.prototype.getLoginForm = function () {
 
   log.debug("Looking for login form..");
   driver.findElement(this.queries.form)
-    .then(function (loginForm) {
+    .then((loginForm) => {
       log.debug('login form found!');
 
       if (loginForm.isDisplayed()) {
         log.debug('Login form is visible')
-        deferred.resolve(loginForm);
+        deferred.resolve(loginForm, this);
       } else {
         log.debug('Loging form is not visible')
         deferred.reject();
@@ -39,7 +39,8 @@ NutakuPage.prototype.getLoginForm = function () {
 
 NutakuPage.prototype.login = function login(loginForm) {
   var deferred = RSVP.defer(),
-    queries = this.queries;
+    queries = this.queries,
+    context = this;
 
   log.debug('entering login creds');
 
@@ -74,7 +75,7 @@ NutakuPage.prototype.login = function login(loginForm) {
       })
       .then(function () {
         log.debug('login page submission completed. Page should be loaded now.')
-        deferred.resolve();
+        deferred.resolve(context);
       })
 
   } else {

@@ -24,10 +24,22 @@ var locations = {
   missionDoIt: { x: 757, y: 520 }
 };
 
-function HellFireGame(nutakuPage, gameConfigs) {
+function HellFireGame(nutakuPage, gameConfigs, type) {
   GameEngine.call(this, nutakuPage, gameConfigs);
   this.constructor = HellFireGame;
-  this.type = 'Hell Fire Girls';
+
+  log.debug("Creating instance of %s hellfire game", type)
+  switch(type){
+    case 'jp':
+      this.type = 'Hell Fire Girls JP';
+      this.url =  "http://www.nutaku.net/games/hellfire-girls/play/";
+      break;
+    case 'us':
+      this.type = 'Hell Fire Girls US';
+      this.url =  "http://www.nutaku.net/games/hellfire-girls-us/play/";
+      break;
+  }
+  
 }
 
 HellFireGame.prototype = Object.create(GameEngine.prototype);

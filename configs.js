@@ -1,41 +1,38 @@
 module.exports = {
     projectName: 'Name',
     server: {
-        port: 3100
+        port: 3200
     },
-    waitMultiplyer: 1,
+    waitMultiplyer: 2,
     natuku: {
         username: "rahvin708@yahoo.com",
         password: "n1s1m0n3"
     },
     game: {
         active: [
-            'osawari',
-            // 'aigis',
             // 'hellfireUS',
-            'hellfire'
+            // 'hellfire',
+            'osawari'
+            // 'aigis',
+            
         ]
     },
     osawari: {
-        url: "http://www.nutaku.net/games/osawari-island/play/",
-        mode: 'daily',
-        // mode: 'static',
-        playCycleCount: 16, //11
+        // mode: 'daily',
+        mode: 'static',
+        playCycleCount: 24, //11
         // playCycleCou5nt: 6,
-        location: 'eventOne',
-        // location: 'eventTwo',
-        levelRow: 2
+        // location: 'eventOne',
+        location: 'eventTwo',
+        levelRow: 1
     },
     aigis: {
-        url: "http://www.nutaku.net/games/millennium-war-aigis/play/",
         mode: 'daily'
     },
     hellfireUS:{
-        url: "http://www.nutaku.net/games/hellfire-girls-us/play/",
         mode: 'daily'
     },
     hellfire:{
-        url: "http://www.nutaku.net/games/hellfire-girls/play/",
         mode: 'daily'
     },
     selenium: {

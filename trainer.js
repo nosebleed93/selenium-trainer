@@ -7,12 +7,13 @@ var _ = require('lodash'),
   RSVP = require('rsvp'),
   Queue = require('queue');
 
-var publicMethods,
-  driver,
-  nutakuPage;
+var publicMethods;
 
 publicMethods = {
-  init: () => {
+  init: (runtimeConfigs) => {
+    var driver,
+      nutakuPage;
+
     return publicMethods.getSeleniumDriverInstance()
       .then(driverInstance => {
         driver = driverInstance;
@@ -28,10 +29,16 @@ publicMethods = {
         return nutakuPage.login(loginForm);
       })
       .then(() => {
-        return publicMethods.runTrainers();
+        return publicMethods.runTrainers(runtimeConfigs, nutakuPage);
       })
-      .then(() =>{
+      .then(() => {
         log.info("Training completed")
+        events.emit('update:text-status', 'idle');
+        events.emit('update:gameEngine', 'none');
+        events.emit('update:roundCount', '');
+        events.emit('update:trainingMode', '');
+
+        driver.quit();
       })
   },
   getSeleniumDriverInstance: () => {
@@ -43,7 +50,7 @@ publicMethods = {
       .usingServer(seleniumServerPath)
       .buildAsync();
   },
-  runTrainers: () => {
+  runTrainers: (runtimeConfigs, nutakuPage) => {
     var deferred = RSVP.defer();
 
     try {
@@ -67,12 +74,12 @@ publicMethods = {
           case 'hellfire':
             log.debug("Hellfire game configured");
             var Hellfire = require('./pages/game/hellfire');
-            gameEngine = new Hellfire(nutakuPage, configs.hellfire);
+            gameEngine = new Hellfire(nutakuPage, configs.hellfire, 'jp');
             break;
-          case 'hellfireUS':
+          case 'hellfire':
             log.debug("Hellfire US game configured");
-            var HellfireUS = require('./pages/game/hellfire-us');
-            gameEngine = new HellfireUS(nutakuPage, configs.hellfireUS);
+            var Hellfire = require('./pages/game/hellfire');
+            gameEngine = new Hellfire(nutakuPage, configs.hellfireUS, 'us');
             break;
 
           default:
@@ -101,6 +108,102 @@ publicMethods = {
     }
 
     return deferred;
+  },
+  scheduled: {
+    start: (runtimeConfigs) => {
+      var scheduledDriver,
+      scheduledNutakuPage;
+
+      return publicMethods.getSeleniumDriverInstance()
+        .then(driverInstance => {
+          scheduledDriver = driverInstance;
+          return scheduledNutakuPage = new NutakuPage(driverInstance);
+        })
+        .then(() => {
+          return scheduledNutakuPage.loadLoginPage();
+        })
+        .then(() => {
+          return scheduledNutakuPage.getLoginForm();
+        })
+        .then((loginForm) => {
+          return scheduledNutakuPage.login(loginForm);
+        })
+        .then(() => {
+          return publicMethods.scheduled.runTrainers(runtimeConfigs, scheduledNutakuPage);
+        })
+        .then(() => {
+          log.info("Training completed")
+          events.emit('update:text-status', 'idle');
+          events.emit('update:gameEngine', 'none');
+          events.emit('update:roundCount', '');
+          events.emit('update:trainingMode', '');
+
+          scheduledDriver.quit();
+        })
+        .catch((error) => {
+          log.error("Unexpected error: ", error);
+          scheduledDriver.quit();
+        })
+    },
+    runTrainers: (runtimeConfigs, scheduledNutakuPage) => {
+      var deferred = RSVP.defer();
+
+      try {
+        var queueConfig = { concurrency: 1 },
+          queue = new Queue(queueConfig);
+
+        _.each(runtimeConfigs.engine, (engineToTrain) => {
+          var gameEngine;
+
+          switch (engineToTrain) {
+            case 'osawari':
+              log.debug("Oswari game configured");
+              var Oswari = require('./pages/game/osawari-island');
+              gameEngine = new Oswari(scheduledNutakuPage, runtimeConfigs);
+              break;
+            case 'aigis':
+              log.debug("Aigis game configured");
+              var Aigis = require('./pages/game/aigis');
+              gameEngine = new Aigis(scheduledNutakuPage, runtimeConfigs);
+              break;
+            case 'hellfire':
+              log.debug("Hellfire game configured");
+              var Hellfire = require('./pages/game/hellfire');
+              gameEngine = new Hellfire(scheduledNutakuPage, runtimeConfigs, 'jp');
+              break;
+            case 'hellfireUS':
+              log.debug("Hellfire US game configured");
+              var Hellfire = require('./pages/game/hellfire-us');
+              gameEngine = new Hellfire(scheduledNutakuPage, runtimeConfigs, 'us');
+              break;
+
+            default:
+              log.error("no configured handler for ", engineToTrain);
+              break;
+          }
+
+          queue.push((queueCompleted) => {
+            events.emit('update:gameEngine', gameEngine.type);
+            gameEngine.beginTrainer()
+              .then(() => { queueCompleted(); })
+          });
+        });
+
+        queue.start((error) => {
+          if (!error) {
+            deferred.resolve();
+          } else {
+            deferred.reject(error);
+          }
+
+        });
+
+      } catch (e) {
+        log.error('failure while trying to get trainer: ', e);
+      }
+
+      return deferred;
+    },
   }
 };
 

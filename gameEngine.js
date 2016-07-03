@@ -14,6 +14,7 @@ function GameEngine(nutakuPage, gameConfigs) {
   this.driver = nutakuPage.driver;
   this.configs = gameConfigs;
   this.board = null;
+  this.url = "not implemented";
 }
 
 GameEngine.prototype.beginTrainer = function () {
@@ -23,7 +24,7 @@ GameEngine.prototype.beginTrainer = function () {
 
   log.info('Starting %s training', context.type);
 
-  return driver.get(configs.url)
+  return driver.get(context.url)
     .then(function () {
       log.debug("looking for game board");
       return context.getBoard(context)
@@ -70,7 +71,6 @@ GameEngine.prototype.configureMode = function (context) {
 }
 
 GameEngine.prototype.havestDaily = function (context) {
-  var board;
 
   return wait(10)
     .then(function () {
@@ -129,6 +129,9 @@ GameEngine.prototype.click = {
   },
   center: function (context) {
     return context.click.boardLocation(context, context.locations.center, 'Center of Board');
+  },
+  startGame: function (context) {
+    return context.click.boardLocation(context, context.locations.startGame, 'Start Game');
   },
 };
 

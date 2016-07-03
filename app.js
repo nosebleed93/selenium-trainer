@@ -10,6 +10,7 @@ var bodyParser = require('body-parser'),
   log = log4js.getLogger('Express'),
   path = require('path'),
   server = require('http').Server(app),
+  scheduler = require('./libraries/scheduler'),
   SocketManager = require('./socket/socketManager'),
   socketManager = new SocketManager(server),
   events = require('./libraries/events').getInstance();
@@ -21,7 +22,9 @@ log4js.configure({
     { type: 'console' },
     { type: '../../../libraries/socketAppender' }
   ]
-})
+});
+
+scheduler.init();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
