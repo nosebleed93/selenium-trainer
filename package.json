@@ -1,11 +1,11 @@
 {
-  "name": "selenium-trainer",
+  "name": "nutaku-trainer",
   "version": "1.0.0",
   "description": "selenium bot for Nutaku games",
-  "main": "trainer.js",
+  "main": "app.js",
   "scripts": {
-    "start": "node trainer.js",
-    "startWeb": "node app.js",
+    "start": "node app.js",
+    "trainer": "node trainer.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

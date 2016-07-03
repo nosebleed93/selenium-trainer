@@ -1,12 +1,12 @@
 module.exports = {
-    projectName: 'Name',
+    projectName: 'Nutaku Trainer',
     server: {
-        port: 3200
+        port: 3100
     },
     waitMultiplyer: 2,
     natuku: {
-        username: "rahvin708@yahoo.com",
-        password: "n1s1m0n3"
+        username: "",
+        password: ""
     },
     game: {
         active: [
