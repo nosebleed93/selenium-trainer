@@ -5,8 +5,8 @@ module.exports = {
     },
     waitMultiplyer: 2,
     natuku: {
-        username: "",
-        password: ""
+        username: "rahvin708@yahoo.com",
+        password: "n1s1m0n3"
     },
     game: {
         active: [
@@ -19,12 +19,16 @@ module.exports = {
     },
     osawari: {
         // mode: 'daily',
+        // mode: 'selloff',
         mode: 'static',
-        playCycleCount: 24, //11
-        // playCycleCou5nt: 6,
-        // location: 'eventOne',
-        location: 'eventTwo',
-        levelRow: 1
+        // mode: 'advancement',
+        playCycleCount: 14, //11
+        sellOffCount: 5,
+        // playCycleCount: 6,
+        level: {
+            location: -2,
+            start: 14
+        },
     },
     aigis: {
         mode: 'daily'

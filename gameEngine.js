@@ -52,7 +52,7 @@ GameEngine.prototype.configureMode = function (context) {
     case 'advancement':
       log.info('Trainer is configured for advancement mode. Perpare to clear different levels.');
       // TODO: Implement advancement game play
-      gamePlayModeHandler = context.playStatic;
+      gamePlayModeHandler = context.playAdvance;
       events.emit('update:trainingMode', 'advancement')
       break;
     case 'static':
@@ -65,7 +65,14 @@ GameEngine.prototype.configureMode = function (context) {
     case 'daily':
       log.info("Configured to harvest daily rewards only");
       gamePlayModeHandler = context.havestDaily;
-      events.emit('update:trainingMode', 'daily')
+      events.emit('update:trainingMode', 'daily');
+      break;
+
+    case 'selloff':
+      log.info("Trainer is configured for sell off mode. Just dumping any low characters")
+      gamePlayModeHandler = context.sellOff;
+      events.emit('update:trainingMode', 'sell off')
+      break;
   }
   return gamePlayModeHandler(context);
 }

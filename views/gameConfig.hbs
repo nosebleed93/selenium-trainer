@@ -1,0 +1,39 @@
+<div class="">
+  <form class="" method="post" action="/manage/config/update">
+    <div class="form-group col-xs-12">
+      <div class='col-xs-12'>
+        <label for="title" class="">Title:</label>
+        <input type='text' name="title" class='form-control' value="{{config.title}}" />
+      </div>
+
+      <div class='col-xs-12'>
+        <label for="playCycleCount" class="">Round to Play:</label>
+        <input type='text' name="playCycleCount" class='form-control' value="{{config.settings.playCycleCount}}" />
+      </div>
+
+      <div class='col-xs-12'>
+        <label for="location" class="">Location:</label>
+        <input type='text' name="location" class='form-control' value='{{config.settings.level.location}}' />
+      </div>
+
+      <div class='col-xs-12'>
+        <label for="startLevel" class="">Starting Level:</label>
+        <input type='text' name="startLevel" class='form-control' value='{{config.settings.level.start}}' />
+      </div>
+
+      <div class='col-xs-12'>
+        <label for="startHour" class="">Start Hour:</label>
+        <input type='text' name="startHour" class='form-control' value='{{config.schedule.hour}}' />
+      </div>
+
+      <div class='col-xs-12'>
+        <label for="startMinute" class=""></label>
+        <input type='text' name="startMinute" class='form-control' value='{{config.schedule.minute}}' />
+      </div>
+
+      <div class=''>
+        <button class='btn btn-primary'>Save</button>
+      </div>
+    </div>
+  </form>
+</div>

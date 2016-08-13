@@ -5,7 +5,7 @@
       "name": "Launch Trainer",
       "type": "node",
       "request": "launch",
-      "program": "${workspaceRoot}/trainer.js",
+      "program": "${workspaceRoot}/trainer-cli.js",
       "stopOnEntry": false,
       "args": [],
       "cwd": "${workspaceRoot}",

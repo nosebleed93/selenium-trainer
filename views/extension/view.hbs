@@ -1,0 +1,158 @@
+<nav id="toolbox" class="navbar navbar-default navbar-fixed-top">
+  <div class="container">
+    <ul class='nav navbar-nav'>
+      <li>
+        <button id="saveBatch" class="btn btn-default navbar-btn">
+          <span class="glyphicon glyphicon-floppy-save"></span>
+          Save Batch
+        </button>
+      </li>
+      <li>
+        <button class="btn btn-default navbar-btn">
+          <span class="glyphicon glyphicon-stats"></span>
+          Compare with Stored
+        </button>
+      </li>
+        
+    </ul>
+
+    <div class="navbar-text">Number of Images: {{imageList.length}}</div>
+  </div>
+</nav>
+
+<div class="container-fluid sub-nav">
+  <div class="row">
+    <div class="col-xs-12">
+      <form action="/extension/scanUrls" method='post' class=''>
+
+        <div class="col-xs-12 form-group">
+          <label for='imageList'>Image List:</label>
+          <textarea name='imageList' class='form-control'></textarea>
+        </div>
+        <div class="col-xs-12">
+          <button class='btn btn-primary'>
+            <span class="glyphicon glyphicon-search"></span>
+            Scan
+          </button>
+          <button class='btn btn-danger'>
+            <span class="glyphicon glyphicon-fire"></span>
+            Clear Queued
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-12">
+      {{#if imageList}}
+        <ul class="list-unstyled">
+          {{#each imageList}}
+            <li class="col-xs-4 image-box" data-index="{{@index}}">
+              <div class="col-xs-8">
+                <!--<img src="/includes/images/gears.gif" data-src="{{this}}largest.jpg" class='img-responsive view-full'>-->
+                <img src="{{this}}largest.jpg" class='img-responsive view-full'>
+              </div>
+
+              <div class="col-xs-4 image-quick-menu text-center">
+                <button class="btn btn-danger remove-image" >
+                  <span class="glyphicon glyphicon-trash"></span>
+                </button>
+                <button class="btn btn-primary edit-image">
+                  <span class="glyphicon glyphicon-pencil"></span>
+                </button>
+              </div>
+
+            </li>
+          {{/each}}
+        </ul>
+      {{/if}}
+    </div>
+  </div>
+
+<!--<script src='/includes/js/jquery.unveil.js'></script>-->
+<script>
+  $(function(){
+    // $("img").unveil();
+
+    $previewModal = $('#imagePreviewModal')
+
+    $('.view-full').on('click', function(){
+      var $fullImage = $('#fullImage'),
+        imageUrl = this.src;
+
+      imageUrl = imageUrl.replace(/largest/, 'full');
+      console.log(imageUrl)
+
+      $fullImage.get(0).src = imageUrl;
+
+      $previewModal.modal('show');
+
+    });
+
+    $('.remove-image').on('click', function(e){
+      e.preventDefault();
+      var $this = $(this),
+        $imgBox = $this.parents('.image-box'),
+        index = $imgBox.data('index');
+
+      console.log('deleting image', index);
+
+      $.ajax({
+        method:'delete',
+        url:'/extension/image/' + index,
+        success: function(){
+          console.log('deleted successfully');
+          $imgBox.remove();
+        },
+        error:function(e){
+          console.error('delete failed: ', e)
+        }
+      })
+
+    })
+
+    $('#saveBatch').on('click', function(){
+        console.log('saving batch..');
+        $.ajax({
+          method:'post',
+          url:'/extension/file/update',
+          success: function(){
+            console.log('sucess')
+          },
+          error: function(e){
+            console.error('failed', e)
+          }
+        })
+      })
+
+    // $('.image-quick-menu').on('mouseenter', function(){
+    //   var $this = $(this);
+
+    //   $this.addClass('')
+    // })
+
+    // console.log('binding event listener')
+    // document.addEventListener('traintakuReceiveImages', function(event){
+    //   console.log('receiving image list', event.imageList);
+    //   _.each(event.imageList, function(image){
+    //     // add to page
+    //   })
+
+    // });
+
+  });
+</script>
+
+<div id="imagePreviewModal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body"><img id='fullImage' class='img-responsive'></div>
+      <div class="modal-footer"></div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+

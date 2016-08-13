@@ -19,3 +19,30 @@
   border:1px solid red;
   margin:7px;
 }
+
+.image-quick-menu{
+  background-color:#f1f1f1;
+  border:1px solid #ccc;
+  padding:7px;
+  border-radius:7px;
+}
+
+.image-box{
+  border:1px solid #FFF;
+  padding:15px;
+  border-radius: 14px;
+}
+
+.image-box:hover{
+  border:1px solid #999;
+  background-color: #ccc;
+}
+
+.image-box img{
+  cursor:pointer;
+}
+
+#toolbox{
+  margin-top:50px;
+}
+.sub-nav{padding-top:50px;}

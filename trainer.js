@@ -173,7 +173,7 @@ publicMethods = {
               break;
             case 'hellfireUS':
               log.debug("Hellfire US game configured");
-              var Hellfire = require('./pages/game/hellfire-us');
+              var Hellfire = require('./pages/game/hellfire');
               gameEngine = new Hellfire(scheduledNutakuPage, runtimeConfigs, 'us');
               break;
 

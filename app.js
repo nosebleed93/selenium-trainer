@@ -1,14 +1,19 @@
 var bodyParser = require('body-parser'),
+  cache = require('./cache'),
   configs = require('./configs'),
   cookieParser = require('cookie-parser'),
   express = require('express'),
+  extensionRoutes = require('./routes/extension'),
   app = express(),
   favicon = require('serve-favicon'),
+  fs = require('fs'),
   hbs = require('hbs'),
   hbsUtility = require('./utilities/hbsUtility'),
+  helmet = require('helmet'),
   log4js = require('log4js'),
   log = log4js.getLogger('Express'),
   path = require('path'),
+  session = require('express-session'),
   server = require('http').Server(app),
   scheduler = require('./libraries/scheduler'),
   SocketManager = require('./socket/socketManager'),
@@ -32,9 +37,19 @@ app.set('view engine', 'hbs');
 hbs.registerPartials(__dirname + '/views/partials');
 hbsUtility.loadHelpers(hbs);
 
+app.use(session({secret: 'ssshhhhh'}));
+// app.use(session({resave: true, saveUninitialized: true, secret: 'SOMERANDOMSECRETHERE', cookie: { maxAge: 60000, secure: true }}));
+// app.use(expressSession({
+//   secret: 'bender is great',
+//   resave: true,
+//   saveUninitialized: true,
+//   cookie: { secure: true, maxAge: 60000 }
+// }));
+
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 // app.use(log4js.connectLogger(log, { level: log4js.levels.DEBUG }));
+app.use(helmet())
 app.use(log4js.connectLogger(log, { level: 'auto' }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -45,10 +60,11 @@ app.use(require('node-sass-middleware')({
   prefix: '/includes/css',
   response: true
 }));
-app.use(express.static(path.join(__dirname, 'includes')));
+app.use('/includes', express.static(path.join(__dirname, 'public')));
 app.use('/includes/bootstrap', express.static(path.join(__dirname, 'node_modules/bootstrap/dist')));
 
 app.use('/', root);
+app.use('/extension', extensionRoutes);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -80,6 +96,14 @@ app.use(function (err, req, res, next) {
     error: {}
   });
 });
+
+try{
+  var rawFileData = fs.readFileSync('./imageStore.json')
+  cache.storedImageData = JSON.parse(rawFileData);
+  log.info("loaded %s images storage into cache.", cache.storedImageData.length);
+}catch(e){
+  log.error('unable to find flat image file',  e)
+}
 
 server.listen(configs.server.port, function () {
   log.info("Starting up http service on port %d", configs.server.port);
