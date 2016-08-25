@@ -38,7 +38,7 @@ app.set('view engine', 'hbs');
 hbs.registerPartials(__dirname + '/views/partials');
 hbsUtility.loadHelpers(hbs);
 
-app.use(session({secret: 'ssshhhhh'}));
+app.use(session({secret: 'ssshhhhhdonttellanyone'}));
 // app.use(session({resave: true, saveUninitialized: true, secret: 'SOMERANDOMSECRETHERE', cookie: { maxAge: 60000, secure: true }}));
 // app.use(expressSession({
 //   secret: 'bender is great',

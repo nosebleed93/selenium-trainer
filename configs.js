@@ -1,7 +1,7 @@
 module.exports = {
     projectName: 'Traintaku',
     server: {
-        port: 3100
+        port: 80
     },
     waitMultiplyer: 2,
     natuku: {
@@ -20,7 +20,7 @@ module.exports = {
     osawari: {
         // mode: 'daily',
         // mode: 'selloff',
-        mode: 'static',
+        mode: 'static', 
         // mode: 'advancement',
         playCycleCount: 14, //11
         sellOffCount: 5,
