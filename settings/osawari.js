@@ -44,6 +44,12 @@ module.exports = {
       entryLocation: { x: 542, y: 330}
     },
     {
+      title: 'Mellow Meadows',
+      index: 8,
+      maxLevels: 20,
+      entryLocation: { x: 602, y: 233 }
+    },
+    {
       title: 'Event 1',
       index: -1,
       maxLevels: 15,

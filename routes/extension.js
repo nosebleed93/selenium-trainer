@@ -1,13 +1,23 @@
 var _ = require('lodash'),
+  archiver = require('archiver'),
   cache = require('../cache'),
   configs = require('../configs'),
   express = require('express'),
   log = require('log4js').getLogger('/'),
   imageUtility = require('../utilities/imageUtility'),
+  request = require('request'),
   router = express.Router(),
   schedule = require('../schedule');
 
 router
+
+  .get('/walkthrough', function(req,res,next){
+    res.render('extension/walkthrough', {
+      title: configs.projectName,
+      projectName: configs.projectName
+    });
+  })
+
   .get('/add', function (req, res, next) {
     var imageList = req.session.imageList;
 
@@ -15,28 +25,70 @@ router
       req.session.imageList = imageList = [];
     }
 
-    console.log(imageList.length)
-
     res.render('extension/view', {
       title: configs.projectName,
       projectName: configs.projectName,
-      imageList: imageList
+      imageList: imageList,
+      imageCount: imageUtility.getTotalImageCount(imageList),
+      source: 'session'
     });
   })
 
   .get('/current', function (req, res, next) {
-    var imageList = [];
+    try {
+      var imageList
 
-    log.info("Loading %s elements from cache", cache.storedImageData.length);
-    _.each(cache.storedImageData, (imageData) => {
-      imageList.push(imageData.url);
-    })
-    
-    res.render('extension/view', {
-      title: configs.projectName,
-      projectName: configs.projectName,
-      imageList: imageList
-    });
+      if (cache.storedImageData !== undefined) {
+        imageList = cache.storedImageData.slice(0);
+        if (imageList === undefined) {
+          imageList = cache.storedImageData = [];
+        }
+
+        if (req.session.filters === undefined) {
+          req.session.filters = {
+            jp: false,
+            us: false
+          }
+        }
+
+        if (req.session.filters.jp) {
+          _.remove(imageList, function (categoryObject) {
+            return categoryObject.category === 'hellfireGirlsJP';
+          })
+        }
+
+        if (req.session.filters.us) {
+          _.remove(imageList, function (categoryObject) {
+            return categoryObject.category === 'hellfireGirlsUS';
+          })
+        }
+
+        log.info("Loading %s elements from cache", cache.storedImageData.length);
+
+        res.render('extension/view', {
+          title: configs.projectName,
+          projectName: configs.projectName,
+          imageList: imageList,
+          imageCount: imageUtility.getTotalImageCount(imageList),
+          source: 'archive'
+        });
+      } else {
+
+        res.render('extension/view', {
+          title: configs.projectName,
+          projectName: configs.projectName,
+          imageList: [],
+          imageCount: 0,
+          source: 'archive'
+        });
+
+      }
+
+    } catch (e) {
+      log.error('failed while getting /current', e)
+      res.redirect('/');
+    }
+
   })
 
   .post('/scanUrls', function (req, res, next) {
@@ -47,85 +99,193 @@ router
 
       console.log('received', rawImageList);
 
+      if (rawImageList !== undefined) {
+        imageList = imageUtility.processImageList(rawImageList);
 
-      imageList = imageUtility.processImageList(rawImageList);
-      imageList = _.union(sessionImageList, imageList);
+        imageList = _.union(sessionImageList, imageList);
 
-      req.session.imageList = imageList;
-      console.log(req.session.imageList.length)
+        req.session.imageList = imageList;
+        console.log(req.session.imageList.length)
 
-      res.render('extension/view', {
-        title: configs.projectName,
-        projectName: configs.projectName,
-        imageList: imageList
-      });
+        res.redirect('/extension/add');
+      } else {
+        res.status(500).send();
+      }
+
     } catch (e) {
       log.error('Failed to process images', e);
-      res.status(500);
+      res.status(500).send();
     }
 
   })
 
-  .delete('/image/:index', function (req, res, next) {
+  .delete('/image/:id', function (req, res, next) {
     try {
-      var indexToDelete = parseInt(req.params.index, 10),
-        removedValue;
+      var idToDelete = req.params.id,
+        category = req.body.category,
+        imageListSource = req.body.source,
+        imageList = imageUtility.pickImageSource(imageListSource, req.session.imageList, cache.storedImageData);
 
-      log.info('deleting image ', indexToDelete);
+      if (imageList !== undefined) {
+        log.debug('removing image from %s', imageListSource);
 
-      removedValue = _.remove(req.session.imageList, function (image, i) {
-        return i === indexToDelete;
-      });
-
-      if (removedValue !== undefined) {
-        console.log('successfully removed item: ', removedValue)
-        res.status(200).json({ ErrorNumber: 0 });
-      } else {
-        res.status(404);
+        if (imageUtility.removeImageFromCollection(idToDelete, imageList, category)) {
+          return res.status(200).send();
+        }
       }
+
     } catch (e) {
       log.error('failed to delete image', e);
-      res.status(500);
+      res.status(500).send();
+    }
+
+    return res.status(404).send()
+  })
+
+  .post('/session/clear', function (req, res, next) {
+    try {
+
+      log.debug('clearing session');
+
+      req.session.imageList = [];
+      res.status(200).send()
+
+    } catch (e) {
+      log.error('failed to clear session', e);
+      res.status(500).send();
     }
 
   })
 
-  .post('/file/save', function (req, res, next) {
+  .post('/update/image', function (req, res, next) {
     try {
-      var imageList = req.session.imageList,
-        formattedImageList;
+      var id = req.body.id,
+        name = req.body.name,
+        season = req.body.season,
+        category = req.body.category,
+        imageListSource = req.body.source,
+        imageList = imageUtility.pickImageSource(imageListSource, req.session.imageList, cache.storedImageData),
+        requestImageObject;
 
-      formattedImageList = imageUtility.formatListForStorage(imageList);
+      if (imageList !== undefined) {
+        log.debug('updating image id [%s] in category [%s] using source [%s]', id, category, imageListSource);
 
-      if (formattedImageList !== undefined) {
+        if (id !== undefined) {
+          requestImageObject = {
+            id: id,
+            name: name,
+            season: season
+          };
 
+          if (imageUtility.updateImageInCollection(requestImageObject, imageList, category)) {
+            res.status(200).send();
+          } else {
+            res.status(404).send();
+          }
+        } else {
+          res.status(500).send();
+        }
+      } else {
+        res.status(500).send();
       }
 
-
     } catch (e) {
-      log.error('Failed to save file store', e);
-      res.status(500);
+      log.error('failed to update image', e);
+      res.status(500).send();
     }
 
   })
 
-  .post('/file/update', function (req, res, next) {
-    try {
-      var imageList = req.session.imageList;
+  // .post('/session/update/image', function (req, res, next) {
+  //   try {
+  //     var id = req.body.id,
+  //       name = req.body.name,
+  //       season = req.body.season,
+  //       requestImageObject;
 
-      imageUtility.storeChanges(imageList, './imageStore.json')
-        .then(() => {
-          res.status(200);
-        })
-        .catch(() => {
-          res.status(500);
-        })
-      
+  //     if (id !== undefined) {
+  //       requestImageObject = {
+  //         id: id,
+  //         name: name,
+  //         season: season
+  //       };
+
+  //       if (imageUtility.updateImageInCollection(requestImageObject, req.session.imageList)) {
+  //         res.status(200).send();
+  //       } else {
+  //         res.status(404).send();
+  //       }
+
+  //     } else {
+  //       res.status(500).send();
+  //     }
+
+
+  //   } catch (e) {
+  //     log.error('failed to update image', 1001);
+  //     res.status(500).send();
+  //   }
+
+  // })
+
+  .post('/update/collection', function (req, res, next) {
+    try {
+      var imageListSource = req.body.source,
+        imageList = imageUtility.pickImageSource(imageListSource, req.session.imageList, cache.storedImageData);
+
+      if (imageList !== undefined) {
+        log.debug('Storing images');
+
+        imageUtility.storeChanges(imageList, './imageStore.json')
+          .then(() => {
+            res.status(200).send();
+          })
+          .catch((e) => {
+            log.error(e);
+            res.status(500).send();
+          })
+
+      } else {
+        res.status(404).send();
+      }
+
     } catch (e) {
       log.error('Failed to update file store', e);
-      res.status(500);
+      res.status(500).send();
     }
 
+  })
+
+  .get('/download', function (req, res) {
+    var archive = archiver.create('zip');
+
+    archive.on('error', function (err) {
+      res.status(500).send({ error: err.message });
+    });
+
+    //set the archive name
+    res.attachment('hellfireGirls.zip');
+
+    //on stream closed we can end the request
+    archive.on('end', function () {
+      log.debug('Created zip sized %d bytes', archive.pointer());
+    });
+
+    archive.pipe(res)
+
+    _.each(cache.storedImageData, function (image) {
+      var imageData,
+        fileName = image.name !== undefined && image.name !== '' ? image.name : image.id;
+
+      imageData = request(image.url + 'full.jpg')
+        .on('error', function (e) {
+          log.error('failed to load image %s:', fileName, e);
+        })
+
+      archive.append(imageData, { name: fileName + '.jpg' });
+    });
+
+    archive.finalize();
   })
 
 module.exports = router;

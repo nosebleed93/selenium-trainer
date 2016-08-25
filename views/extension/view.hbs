@@ -8,15 +8,19 @@
         </button>
       </li>
       <li>
-        <button class="btn btn-default navbar-btn">
+        <button class="download btn btn-default navbar-btn">
+          <span class="glyphicon glyphicon-stats"></span>
+          Download
+        </button>
+        <!--<button class="btn btn-default navbar-btn">
           <span class="glyphicon glyphicon-stats"></span>
           Compare with Stored
-        </button>
+        </button>-->
       </li>
         
     </ul>
 
-    <div class="navbar-text">Number of Images: {{imageList.length}}</div>
+    <div class="navbar-text">Number of Images: {{imageCount}}</div>
   </div>
 </nav>
 
@@ -30,11 +34,11 @@
           <textarea name='imageList' class='form-control'></textarea>
         </div>
         <div class="col-xs-12">
-          <button class='btn btn-primary'>
+          <button class='btn btn-primary' type='submit'>
             <span class="glyphicon glyphicon-search"></span>
             Scan
           </button>
-          <button class='btn btn-danger'>
+          <button class='clear-session btn btn-danger'>
             <span class="glyphicon glyphicon-fire"></span>
             Clear Queued
           </button>
@@ -44,30 +48,73 @@
   </div>
 
   <div class="row">
+
+    {{#if imageList.length}}
     <div class="col-xs-12">
       {{#if imageList}}
-        <ul class="list-unstyled">
+        <ul id="imageList" class="list-unstyled">
           {{#each imageList}}
-            <li class="col-xs-4 image-box" data-index="{{@index}}">
-              <div class="col-xs-8">
-                <!--<img src="/includes/images/gears.gif" data-src="{{this}}largest.jpg" class='img-responsive view-full'>-->
-                <img src="{{this}}largest.jpg" class='img-responsive view-full'>
-              </div>
+            {{#each images}}
+              <li class="col-xs-4 image-box" data-id="{{id}}" data-category="{{../category}}">
+                <div class="col-xs-8">
+                  <!--<img src="/includes/images/gears.gif" data-src="{{this}}largest.jpg" class='img-responsive view-full'>-->
+                  <img src="{{url}}largest.jpg" class='img-responsive view-full'>
+                </div>
 
-              <div class="col-xs-4 image-quick-menu text-center">
-                <button class="btn btn-danger remove-image" >
-                  <span class="glyphicon glyphicon-trash"></span>
-                </button>
-                <button class="btn btn-primary edit-image">
-                  <span class="glyphicon glyphicon-pencil"></span>
-                </button>
-              </div>
+                <div class="col-xs-4 image-quick-menu text-center">
+                  <button class="btn btn-danger remove-image" >
+                    <span class="glyphicon glyphicon-trash"></span>
+                  </button>
+                  <button class="btn btn-primary edit-details">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                  </button>
+                </div>
 
-            </li>
+                <div class="details-form col-xs-10 hide">
+                  <h3 class="text-center">Edit Details</h3>
+                  <form class="form">
+                    <input name='source' type='hidden' value='{{../../source}}' />
+                    <input name="id" type="hidden" value="{{id}}" />
+                    <input name="category" type="hidden" value="{{../category}}" />
+                    <div class="form-group">
+                      <label for="name">Name:</label>
+                      <input name="name" class="form-control" value="{{name}}" />
+                    </div>
+                    <div class="form-group">
+                      <label for="season">Season:</label>
+                      <input name="season" class="form-control" value="{{season}}" />
+                    </div>
+
+                    <div class="text-center">
+                      <button class="update-details btn btn-primary" type="button">Update</button>
+                      <button class="cancel-details btn btn-danger" type="button">Cancel</button>
+                    </div>
+                  </form>
+                </div>
+
+              </li>
+            {{/each}}
           {{/each}}
         </ul>
       {{/if}}
     </div>
+    {{else}}
+      <div class="col-xs-12 text-center">
+        {{#equals "session" source }}
+          <div>
+            <h3>No Images Found</h3>
+            <p>Install the chrome extension here then load up <a href='http://www.nutaku.net/games/hellfire-girls/play/'>Hellfire Girls</a>. Simply page through your collection, making sure each image loads. Drop the image list the extension generates in the 'Image List' field above to view the images. Modify the images and select download to get the images in a zip file. Select save batch to submit your images to the community.</p>
+          </div>
+        {{/equals}}
+        {{#equals "archive" source }}
+        <div>
+          <h3>No Images Found</h3>
+          <p>Looks like no one has submitted any images for long term storage. Checkout the <a href='/extension/add'>add page</a> to get started storing and downloading images.</p>
+        </div>
+        {{/equals}}
+        
+      </div>
+    {{/if}}
   </div>
 
 <!--<script src='/includes/js/jquery.unveil.js'></script>-->
@@ -94,13 +141,18 @@
       e.preventDefault();
       var $this = $(this),
         $imgBox = $this.parents('.image-box'),
-        index = $imgBox.data('index');
+        id = $imgBox.data('id'),
+        category = $imgBox.data('category');
 
-      console.log('deleting image', index);
+      console.log('deleting image', id);
 
       $.ajax({
         method:'delete',
-        url:'/extension/image/' + index,
+        url:'/extension/image/' + id,
+        data: {
+          category: category,
+          source: '{{source}}'
+        },
         success: function(){
           console.log('deleted successfully');
           $imgBox.remove();
@@ -116,15 +168,89 @@
         console.log('saving batch..');
         $.ajax({
           method:'post',
-          url:'/extension/file/update',
+          url:'/extension/update/collection',
+          data: {
+            source: '{{source}}'
+          },
           success: function(){
-            console.log('sucess')
+            console.log('success')
           },
           error: function(e){
             console.error('failed', e)
           }
         })
       })
+
+    $('.edit-details').on('click', function(e){
+      var $imageBox = $(this).parents('.image-box'),
+        $details = $imageBox.find('.details-form');
+
+      e.preventDefault();
+
+      $details.removeClass('hide');
+
+    })
+
+    $('.cancel-details').on('click', function(e){
+      var $details = $(this).parents('.details-form');
+      e.preventDefault();
+
+      $details.addClass('hide');
+    })
+
+    $('.update-details').on('click', function(e){
+      var $form = $(this).parents('form'),
+         $details = $(this).parents('.details-form');
+      e.preventDefault();
+
+      if($form.length){
+        $.ajax({
+          type: 'post',
+          url: '/extension/update/image',
+          data: $form.serialize(),
+          success:function(){
+            console.log('updated');
+            $details.addClass('hide');
+          },
+          error:function(e){
+            console.log('failed to update', e)
+          }
+        })
+      }
+    })
+
+    $('.clear-session').on('click', function(e){
+      e.preventDefault();
+
+      $.ajax({
+        type: 'post',
+        url: '/extension/{{source}}/clear',
+        success:function(){
+          $('#imageList').empty();
+          $rawList.val('');
+        }
+      })
+    })
+
+    $('.download').on('click', function(e){
+      e.preventDefault();
+
+      window.location = '/extension/download'
+
+    //   $.ajax({
+    //     type: 'post',
+    //     url:'/extension/download',
+    //     data:{
+    //       collection: '{{collection}}'
+    //     },
+    //     success:function(data){
+    //       console.log('download a coming', data);
+    //     },
+    //     error:function(e){
+    //       console.error('failed to create download', e);
+    //     }
+    //   })
+    // })
 
     // $('.image-quick-menu').on('mouseenter', function(){
     //   var $this = $(this);
@@ -139,7 +265,7 @@
     //     // add to page
     //   })
 
-    // });
+    });
 
   });
 </script>

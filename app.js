@@ -1,6 +1,7 @@
 var bodyParser = require('body-parser'),
   cache = require('./cache'),
   configs = require('./configs'),
+  cors = require('cors'),
   cookieParser = require('cookie-parser'),
   express = require('express'),
   extensionRoutes = require('./routes/extension'),
@@ -50,6 +51,10 @@ app.use(session({secret: 'ssshhhhh'}));
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 // app.use(log4js.connectLogger(log, { level: log4js.levels.DEBUG }));
 app.use(helmet())
+app.use(cors({
+  origin: ['http://localhost:3100', 'http://127.0.0.1:3100'],
+  methods: ['get', 'post']
+}))
 app.use(log4js.connectLogger(log, { level: 'auto' }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));

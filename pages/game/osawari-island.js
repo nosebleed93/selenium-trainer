@@ -15,6 +15,8 @@ var locations = {
   center: { x: 270, y: 480 },
   startGame: { x: 738, y: 413 },
   playQuest: { x: 817, y: 366 },
+  dontShowMessageAgain: {x: 662, y:493},
+  closeMessageWindow: {x: 826, y:61},
   quest: {
     letsGo: { x: 735, y: 309 },
     eventOne: { x: 401, y: 150 },

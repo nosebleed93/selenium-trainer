@@ -1,0 +1,65 @@
+<div class="container-fluid">
+    <div class="row">
+      <h1>Getting Started</h1>
+      <p>The process for grabbing the cards you've found is pretty straight forward. You install an extension, browse through the girls you've found, copy the image urls into the add section and profit.</p>
+
+      <div class='col-xs-12'>
+        <h2>Installing the extension</h2>
+        <p>The extension is a simple chrome extension that intercepts traffic for specific domains related to the game. It filters out the requests not ending in 'jpg' and creates a list of all the images its found. It makes these images available to copy so you can paste them into the compainon site or do whatever the hell you want to do with a line delimited selection of image urls.</p>
+        <p>I will be making publish the source shortly so feel free to check it out to make sure I'm not being nefarious. The code is really ugly, this is my first attempt at a chrome plugin and I have no idea what I'm doing.</p>
+        <p>Because this is a rush job and I haven't had the time to submit the extension to the chrome store, you will need to manually install the extension. Below are the steps to do so.</p>
+        <ol >
+          <li><p>Download the source <a href='/includes/files/traintaku-extension-master-v0-1.zip'>here</a> and unzip it to a folder or grab the latest from <a href='https://github.com/nosebleed93/traintaku-extension'>github</a></p></li>
+          <li>
+            <p>Open up the chrome extensions menu</p>
+            <img src='/includes/images/walkthru/extension-step1.png' class="img-responsive">
+          </li>
+          <li>
+            <p>Enable Developer Mode</p>
+            <img src='/includes/images/walkthru/extension-step2.png' class="img-responsive">
+          </li>
+          <li>
+            <p>Click 'Load unpacked extension..' button. This will let you select a folder path to attempt to load a new extension from. Make sure to load the folder with the manifest.json file.</p>
+            <img src='/includes/images/walkthru/extension-step3.png' class="img-responsive">
+          </li>
+          <li>
+            <p>Open the folder you unzipped.</p>
+            <img src='/includes/images/walkthru/extension-step4.png' class="img-responsive">
+          </li>
+          <li>
+            <p>That should load the extension. Make sure that the enable flag is set and you should see a new chrome icon in your toolbar.</p>
+            <img src='/includes/images/walkthru/extension-step5.png' class="img-responsive">
+          </li>
+        </ol>
+      </div>
+
+      <div class='col-xs-12'>
+        <h2>Gotta Catch 'em All</h2>
+        <p>Once the extension is installed and enabled, just go to the <a href='http://www.nutaku.net/games/hellfire-girls/play/'>Hellfire Girls</a> game and walk through your girls collection. Below is a click by click walk through</p>
+        <ol>
+          <li><img src='/includes/images/walkthru/step1.png' class="img-responsive"></li>
+          <li><img src='/includes/images/walkthru/step2.png' class="img-responsive"></li>
+          <li><img src='/includes/images/walkthru/step3.png' class="img-responsive"></li>
+          <li><img src='/includes/images/walkthru/step4.png' class="img-responsive"></li>
+          <li><img src='/includes/images/walkthru/step5.png' class="img-responsive"></li>
+          <li><img src='/includes/images/walkthru/step6.png' class="img-responsive"></li>
+        </ol>
+      </div>
+
+      <div class='col-xs-12'>
+        <h2>Managing Captured Images</h2>
+        <p>After you've scanned through the image list, you will presented with all the pics that were found in your list. You may need to glance over it to remove any dead or unwanted images. Note that deleting duplicates may delete all instances of that image.
+        <ol>
+          <li>
+            <p>Clicking the red trash can will delete an image. There is no undo, so if you accidently deleted one you may need to rescan to recover it.</p>
+            <img src='/includes/images/walkthru/delete-image.png' class="img-responsive">
+          </li>
+          <li>
+            <p>If you're planning on submitting data to the community for archiving you can edit the name and season the image is for. This data will be available when viewing the current archive, and will be made available in the future as json.</p>
+            <img src='/includes/images/walkthru/modify-image.png' class="img-responsive">
+          </li>
+        </ol>
+      </div>
+
+    </div>
+</div>

@@ -29,8 +29,9 @@
 
 .image-box{
   border:1px solid #FFF;
-  padding:15px;
+  padding:25px;
   border-radius: 14px;
+  position:relative;
 }
 
 .image-box:hover{
@@ -46,3 +47,14 @@
   margin-top:50px;
 }
 .sub-nav{padding-top:50px;}
+
+.details-form{
+  background-color:#f1f1f1;
+  border:1px solid #999;
+  border-radius:14px;
+  position:absolute;
+  z-index: 999;
+  top:10%;
+  left:10%;
+  padding:15px;
+}

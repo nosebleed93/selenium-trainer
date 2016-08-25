@@ -1,5 +1,5 @@
 module.exports = {
-    projectName: 'Nutaku Trainer',
+    projectName: 'Traintaku',
     server: {
         port: 3100
     },
@@ -27,7 +27,7 @@ module.exports = {
         // playCycleCount: 6,
         level: {
             location: -2,
-            start: 14
+            start: 1
         },
     },
     aigis: {
@@ -47,5 +47,19 @@ module.exports = {
         port: '4444',
         path: '/wd/hub',
         protocol: 'http'
+    },
+    extension:{
+        acceptedDomains: [
+            // {
+            //     domain: 'd19wdm58bh3gr6.cloudfront.net',
+            //     name: '',
+            //     category: 'hellfireGirlsUS'
+            // },
+            {
+                domain: 'd3uf62e688dxf8.cloudfront.net',
+                name: '',
+                category: 'hellfireGirlsJP'
+            }            
+        ]
     }
 }

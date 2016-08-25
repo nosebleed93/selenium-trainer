@@ -19,15 +19,13 @@ module.exports = [
       ],
       mode: 'static',
       playCycleCount: 14,
-      // playCycleCou5nt: 6,
       sellOffCount: 5,
       level: {
           location: -2,
           start: 14
       },
     },
-    schedule: { minute: 30, hour: 0 }   // Every 10hrs
-    // schedule: { minute: 41, hour: 17 }    // testing settings
+    schedule: { minute: 30, hour: 23 }   // Every 10hrs
   },
   {
     title: 'osawari event morning',
@@ -37,12 +35,11 @@ module.exports = [
       ],
       mode: 'static',
       playCycleCount: 14,
-      // playCycleCou5nt: 6,
+      sellOffCount: 5,
       level: {
           location: -2,
           start: 14
       },
-      sellOffCount: 5,
     },
     schedule: { minute: 10, hour: 7 }
   },
@@ -54,7 +51,6 @@ module.exports = [
       ],
       mode: 'static',
       playCycleCount: 14,
-      // playCycleCou5nt: 6,
       sellOffCount: 5,
       level: {
           location: -2,

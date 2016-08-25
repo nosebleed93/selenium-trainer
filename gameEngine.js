@@ -116,6 +116,28 @@ GameEngine.prototype.startGame = function (context) {
       log.debug('waiting for game to load..')
       return wait(30)
     })
+    .then(() => {
+      return context.clearDailyRewardsAndNotifications(context) 
+    })
+    .then(function () {
+      log.debug('waiting for rewards to clear')
+      return wait(10)
+    })
+}
+
+GameEngine.prototype.clearDailyRewardsAndNotifications = function (context) {
+  return context.click.center(context)
+    .then(function () {
+      log.debug('clear daily reward');
+      return wait(10);
+    })
+    .then( () => { 
+      return context.click.center(context) 
+    })
+    .then(function () {
+      log.debug('clearing reward card');
+      return wait(10);
+    })
 }
 
 
