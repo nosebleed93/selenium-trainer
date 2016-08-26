@@ -16,10 +16,7 @@ var bodyParser = require('body-parser'),
   path = require('path'),
   session = require('express-session'),
   server = require('http').Server(app),
-  scheduler = require('./libraries/scheduler'),
-  SocketManager = require('./socket/socketManager'),
-  socketManager = new SocketManager(server),
-  events = require('./libraries/events').getInstance();
+  scheduler = require('./libraries/scheduler');
 
 var root = require('./routes/index');
 
