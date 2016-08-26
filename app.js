@@ -97,7 +97,7 @@ if (app.get('env') === 'development') {
 app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error', {
-    message: err.message,
+    message: 'oops',
     error: {}
   });
 });
@@ -110,8 +110,10 @@ try{
   log.error('unable to find flat image file',  e)
 }
 
-server.listen(configs.server.port, function () {
-  log.info("Starting up http service on port %d", configs.server.port);
+
+app.set('port', process.env.PORT || configs.server.port);
+server.listen(app.get('port'), function () {
+  log.info("Starting up http service on port %d", app.get('port'));
 });
 
 module.exports = app;
